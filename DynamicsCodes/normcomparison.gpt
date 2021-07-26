@@ -1,0 +1,13 @@
+set term postscript enhanced eps color dashed 24
+plotname="norm"
+set output plotname.".eps"
+
+set xrange [0:*]
+set xlabel "Time [fs]" offset 1,0,0
+set ylabel "Norm"
+set title "Norm"
+
+plot "./norm.dat" u 1:2 w l lc "black" 1 lw 4 t ""
+
+load "< ps2pdf -dEPSCrop ".plotname.".eps > /dev/null 2>&1"
+load "< okular ".plotname.".pdf > /dev/null 2>&1 &"
