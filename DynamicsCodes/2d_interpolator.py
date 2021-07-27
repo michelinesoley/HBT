@@ -17,11 +17,11 @@ import sys
 ndim1 = 2**5		# dimensions of new grid along x
 ndim2 = 2**5		# dimensions of new grid along y
 
-q1_max = 100.		# maximun range of new grid along x
-q1_min = -100.		# minimun range of new grid along x
+q1_max = 100.		# maximum range of new grid along x
+q1_min = -100.		# minimum range of new grid along x
 
-q2_max = 250.		# maximun range of new grid along y
-q2_min = -250.		# minimun range of new grid along y
+q2_max = 250.		# maximum range of new grid along y
+q2_min = -250.		# minimum range of new grid along y
 
 #pot_type='gs'		# Ground State potential
 pot_type='es'		# Excited State potential

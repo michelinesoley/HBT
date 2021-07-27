@@ -1,5 +1,5 @@
 set term postscript enhanced eps color dashed 24
-plotname="expectationvaluescomparisonOH"
+plotname="expectationvalueOH"
 set output plotname.".eps"
 
 set xrange [0:*]

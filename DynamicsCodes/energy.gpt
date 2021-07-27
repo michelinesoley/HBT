@@ -1,13 +1,13 @@
 set term postscript enhanced eps color dashed 24
-plotname="expectationvalueCCC"
+plotname="energy"
 set output plotname.".eps"
 
 set xrange [0:*]
 set xlabel "Time [fs]" offset 1,0,0
-set ylabel "Amplitude [a.u.]"
-set title "Expectation Values of C-C-C Stretch Mode"
+set ylabel "Energy [au]"
+set title "Expectation Value of Total Energy"
 
-plot "expectationvalues.dat" u 1:3 w l lc "black" lw 4 t ""
+plot "energy.dat" u 1:4 w l lc "black" lw 4 t ""
 
 load "< ps2pdf -dEPSCrop ".plotname.".eps > /dev/null 2>&1"
 load "< okular ".plotname.".pdf > /dev/null 2>&1 &"

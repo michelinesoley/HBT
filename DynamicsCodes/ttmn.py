@@ -1,6 +1,4 @@
-# ttsoft propagation with a reaction surface Hamiltonian - VSB 10/11/20
-# Surfaces described by Eqs. 19-24 [J. Photochem. Photobiol. A: Chemistry 190, 274–282 (2007)].
-# Corresponding TDSCF calculation [J. Phys. Chem. B  108, 6745-6749 (2004)] 
+# TT-SOFT propagation with a reaction surface Hamiltonian
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,21 +20,17 @@ from HBT_potential import init_pot,reactive_potential,bath_displacement,bath_cou
 
 def parameters():
     global nstates,n,nx,EYE,tau,eps,rma,dim,rd,ro,po
-    global dx,dp,nsc,gam,d,ddx
-    global sig,m,om,eshift
-    global wj,cj,qmodes,Vb1,Vb2,aflag
-    global specshift
+    global dx,dp,nsc,d,ddx
+    global sig,m,om
+    global qmodes
     global minpos,L
     global displacements,coupling
 
     qmodes = 3 # 67              # qmodes = 0 for TDSCF simulation
     nsc = 800             # number of propagation steps
     tau = 12.5            # propagation time step
-    gam = 1e-7            # phenomeological dumping factor for simulating homogeneous broadening
     eps = 1e-14            # tt approx error
     rma = 10                # max tt rank
-    eshift = 0          # energy shift for PESs
-    specshift = 0 # spectrum energy shift in au
     dim = 2+qmodes         # number of coords
     nstates=2              # number of surfaces
     d = 5
@@ -86,7 +80,7 @@ def parameters():
     for ii in range(qmodes):
       expeczpe=expeczpe+om[ii+2]
     expeczpe=expeczpe/2.
-    expeczpe=expeczpe+0.00233425640548065 # Ground state large-amplitude mode ZPE
+    expeczpe=expeczpe+0.00233425640548065 # Ground state large-amplitude mode ZPE for HBT
     print("Expected ZPE=",expeczpe)
     
     return()
@@ -367,7 +361,7 @@ def savewavefunction(tt_tensor,filename):
 # main program
 if __name__ == "__main__":
     global n,nx,EYE,tau,eps,rma,dim,ro,po,rd,ddx
-    global dx,dp,m,om,nsc,Pxy,gam,d,qmodes,eshift
+    global dx,dp,m,om,nsc,Pxy,d,qmodes
     global minpos,L
     global displacements,coupling
     global xminorig,xmaxorig,yminorig,ymaxorig
