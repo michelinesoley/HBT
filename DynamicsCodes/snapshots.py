@@ -173,7 +173,7 @@ tau = 12.5
 count=0
 ttwfnfine = []
 ttsave=np.zeros(6)
-for qq in [0,160,320,480,640,799]:
+for qq in [0,160,320,480,640,799]: # Individual time steps to be visualized
   temptime = qq*au2fs*tau
   ttsave[count] = temptime
   tempfilename='realprop%i' % qq
