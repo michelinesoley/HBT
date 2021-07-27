@@ -35,6 +35,6 @@ Further results can be visualized with the following commands:
  gnuplot expectationvalueOH.gpt
  ```
  
- Additional documentation is included in documentation.pdf (under construction).
+ Additional documentation is included in documentation.pdf.
  
 
