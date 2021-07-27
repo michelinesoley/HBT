@@ -12,7 +12,7 @@ TT-SOFT code for determination of UV pump/X-ray probe UV spectra
  - matplotlib
  - numpy
  - scipy
- - gnuplot
+ - gnuplot (optional)
  
  # Instructions
  
