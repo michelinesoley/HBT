@@ -500,6 +500,7 @@ for i in idx:
 #---------------------------------------
 ### hess_ampl 
 
+### index of NM to plot
 idx = []
 #idx = [ [11,11], [11,9], [2,68] ]
 
@@ -510,7 +511,6 @@ for i in idx:
 	title = 'hess amplitude # {} {}'.format(i[0]+1,i[1]+1)
 	ctitle = r'$\mathregular{H \ / \ cm^{-1}}$'
 	plot_2d_1x1(data,title=title,xlabel=xlabel,ylabel=ylabel,ctitle=ctitle)
-#	plt.show()
 
 ###################################################################
 ### show plot
@@ -596,6 +596,7 @@ out.close()
 ###################################################################
 ### end program
 
+print('DONE')
 sys.exit(0)
 
 
