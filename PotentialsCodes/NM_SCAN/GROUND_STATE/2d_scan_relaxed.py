@@ -1,33 +1,48 @@
 #!/usr/bin/python
 
-###################################################################
-### Reads normal_modes of TS (previously computed) and 		### 
-### generates Gaussian input files for a 2D scan following the	### 
-### selected normal modes with other normal modes relaxed 	###
-### (employing GIC optimization).				###
-###################################################################
-
 import sys
 import numpy as np
 
-###################################################################
+#######################################################################
+###        Generates Gaussian input files for a 2D scan 			###
+###																	###
+### The script reads the normal modes of TS (previously computed 	###
+### by 'read_normal_modes.py')	and generates Gaussian input files	###
+### for a 2D scan (employing GIC optimization) following the 		###
+### selected normal modes 'nmodes1/2', while the rest of normal 	###
+### modes are relaxed. 												###
+###																	###
+### Input needed by the program:									###
+### > gjf_header.inp: Header with options for the Gaussian calc.	### 
+###																	###
+### Output:															###
+### > 2d_scan_relaxed.out: Information of 2D grid					###
+### > config_*_*.gjf: Gaussian input files  						###	
+###																	###
+#######################################################################
+
+au2ang = .529177210903							# au to Angstrom factor (CODATA 2018)
+amu2au = 1.67262192369E-27/9.1093837015E-31  	# proton mass over electron mass (CODATA)
+
+#######################################################################
 ### define some parameters
+
+### path for NM analysis
+path_nm = '../../NM_READ/'
 
 nmode1 = 1				# selected normal mode 1  
 nmode2 = 5				# selected normal mode 2 
 
-q_max1 = 60.				# maximun Q1 in the scan
-q_min1 = -50.				# mimimun Q1 in the scan
+q_max1 = 60.			# maximun Q1 in the scan
+q_min1 = -50.			# mimimun Q1 in the scan
 dx1 = 10  				# step of scan along Q1
 
-q_max2 = 240.				# maximun Q2 in the scan
-q_min2 = -140.				# mimimun Q2 in the scan
+q_max2 = 240.			# maximun Q2 in the scan
+q_min2 = -140.			# mimimun Q2 in the scan
 dx2 = 20.  				# step of scan along Q2
 
 npoints1 = int((q_max1-q_min1)/dx1)+1	# number of points in the scan along Q1
 npoints2 = int((q_max2-q_min2)/dx2)+1	# number of points in the scan along Q2
-
-idebug = 0				# if !=0, print extra info to screen
 
 print('nmode = ',nmode1,nmode2)
 print('q_max = ',q_max1,q_max2)
@@ -36,31 +51,19 @@ print('dx = ',dx1,dx2)
 print('npoints = ',npoints1,npoints2,npoints1*npoints2)
 
 ###################################################################
-### define conversion factors
-
-au2ang = .529177210903				# au to Angstrom factor (CODATA 2018)
-au2cm  = 219474.63068 				# au to cm-1 factor
-amu2au = 1.67262192369E-27/9.1093837015E-31  	# proton mass over electron mass (CODATA)
-
-###################################################################
 ### load data
 ### Note1: positions are read in m_e**(0.5)*Bohr
 ### Note2: masses are read in m_e
 ### Note3: normal vectors are orthonormal and unitless
 ### Note4: freq are read in cm-1
 
-path = '../../../../../NM_READER/'
+pos = np.loadtxt(path_nm+'pos_ts.dat')
 
-pos = np.loadtxt(path+'pos_ts.dat')
+atmass = np.loadtxt(path_nm+'atmass_ts.dat')
 
-atmass = np.loadtxt(path+'atmass_ts.dat')
+nm = np.loadtxt(path_nm+'nm_ts.dat')
 
-nm = np.loadtxt(path+'nm_ts.dat')
-
-freq = np.loadtxt(path+'freq_ts.dat')
-
-if (idebug>0):
-	print('freq = ',freq[nmode1-1],freq[nmode2-1])
+freq = np.loadtxt(path_nm+'freq_ts.dat')
 
 ###################################################################
 ### define some parameters
@@ -95,27 +98,6 @@ for i in range(npoints1):
 
 		pos_new[i,j,:] = pos + Q_im1 + Q_im2
 out.close()
-
-### test COM
-
-if (idebug>0):
-	for i in range(npoints1): 
-		for j in range(npoints2): 
-			sum_x = 0.0
-			sum_y = 0.0
-			sum_z = 0.0
-			sum_m = 0.0
-			for k in range(natoms):
-				sum_x += pos[3*k+0]*np.power(atmass[k],0.5)
-				sum_y += pos[3*k+1]*np.power(atmass[k],0.5)
-				sum_z += pos[3*k+2]*np.power(atmass[k],0.5)
-				sum_m += atmass[k]
-
-			sum_x /= sum_m
-			sum_y /= sum_m
-			sum_z /= sum_m
-
-			print('com = ',i,j,sum_x,sum_y,sum_z)
 
 ###################################################################
 ### generate GIC label related options
@@ -185,12 +167,6 @@ for j in range(natoms):
 	gic_nm2 = gic_nm2 + 'P{}'.format(j+1)
 	if(j!=natoms-1):
 		gic_nm2 = gic_nm2 + '+'
-
-if (idebug>0):
-	print('gic_nm_label1 = ',gic_nm_label1)
-	print('gic_nm1 = ',gic_nm1)
-	print('gic_nm_label2 = ',gic_nm_label2)
-	print('gic_nm2 = ',gic_nm2)
 
 ###################################################################
 ### generate Gaussian input files
