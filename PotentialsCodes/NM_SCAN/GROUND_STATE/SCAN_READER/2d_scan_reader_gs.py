@@ -13,6 +13,11 @@ from scipy import interpolate
 ### The script reads the outputs of Gaussian calculations and 	###
 ### generates the 2D PES, NM displacement vectors and 			###
 ### NM coupling matrix as a function of scanned normal modes.	###
+###																###
+### Input:														###
+### > *.log files of Gaussian calculations						###
+### > *.fchk files of Gaussian calculations  					###
+###
 ###################################################################
 
 Ha2cm  = 219474.63068 				# Hartree to cm-1 factor
@@ -23,13 +28,15 @@ a02ang = .529177210903				# Bohr to Angstrom factor (CODATA 2018)
 
 ### path for NM analysis
 
-path = '../../../NM_READ/'
+path_nm = '../../../NM_READ/'
 
-### path for Gaussian logfiles
+print('NM path = ',path_nm)
+
+### path for Gaussian log/fchk files
 
 path_log = '../'
 
-print('NM path = ',path)
+print('Logfiles path = ',path_log)
 
 ### define tolerances for setting NM to zero
 
@@ -53,9 +60,9 @@ print('ndim = ',ndim1,ndim2)
 ### define function to read energy from Gaussian logfiles 
 ### Note: energy is read in Hartree
 
-energy_gs = np.zeros([ndim1,ndim2])
+energy = np.zeros([ndim1,ndim2])
 
-energy_gs_error = -1028.
+energy_error = -1028.
 
 def read_energy(idx,jdx,inputfile):
 	''' read energy from Gaussian file '''
@@ -65,8 +72,8 @@ def read_energy(idx,jdx,inputfile):
 	try:	
 		lines=open(inputfile,'r').readlines()
 	except IOError:
-		print('[reader.py] Error. Logfile # {}_{} not found. Using energy_error = {} as energies'.format(idx+1,jdx+1,energy_gs_error))
-		energy_gs[idx,jdx] = energy_gs_error
+		print('[reader.py] Error. Logfile # {}_{} not found. Using energy_error = {} as energies'.format(idx+1,jdx+1,energy_error))
+		energy[idx,jdx] = energy_error
 		return
 
 	### ---------------------------------------------------------------------------
@@ -90,12 +97,12 @@ def read_energy(idx,jdx,inputfile):
 	ierr = 1
 	for k in range(len(lines)):
 		if(line_label in lines[k]):  # found energy section
-			energy_gs[idx,jdx] = float(lines[k].split()[4])
+			energy[idx,jdx] = float(lines[k].split()[4])
 			ierr = 0
 
 	if(ierr!=0):
-		print('[reader.py] Error. GS energy not found in logfile # {}_{}. Using energy_gs_error = {} as energy'.format(idx+1,jdx+1,energy_gs_error))
-		energy_gs[idx,jdx] = energy_gs_error 
+		print('[reader.py] Error. GS energy not found in logfile # {}_{}. Using energy_error = {} as energy'.format(idx+1,jdx+1,energy_error))
+		energy[idx,jdx] = energy_error 
 #		sys.exit(1)
 
 	return
@@ -107,61 +114,35 @@ def read_energy(idx,jdx,inputfile):
 
 for i in range(ndim1):
 	for j in range(ndim2):
-		inputfile='../config_{}_{}.log'.format(i+1,j+1)
+		inputfile=path_log+'config_{}_{}.log'.format(i+1,j+1)
 		read_energy(i,j,inputfile)
 
 ###################################################################
 ### mask values with error
 
-#energy_gs = np.ma.array(energy_gs, mask=(energy_gs==energy_gs_error))
+#energy = np.ma.array(energy, mask=(energy==energy_error))
 
 ###################################################################
 ### shift energy and change units
 
-print('energy_min [au] = ',np.min(energy_gs))
-print('energy_max [au] = ',np.max(energy_gs))
+print('energy_min [au] = ',np.min(energy))
+print('energy_max [au] = ',np.max(energy))
 
-#energy_gs *= Ha2cm
+#energy *= Ha2cm
 
-energy_0 = np.min(energy_gs)
+energy_0 = np.min(energy)
 
-energy_gs -= energy_0
+energy -= energy_0
 
-#FIXME
-'''
-#polito
-data0=energy_gs
-fig,ax= plt.subplots()
-nlines=2
-lw=2
-lmax0 = np.max(data0)
-lmax0 = 6000
-lmin0 = np.min(data0)
-ldel0 = (lmax0-lmin0)/100
-levels0 = np.arange(lmin0,lmax0+ldel0,ldel0)
-print(levels0)
-CS0 = ax.contourf(np.transpose(data0),levels=levels0,cmap='jet',extend='max')
-CL0 = ax.contour(CS0,levels=CS0.levels[::nlines],colors='k',linewidths=lw)
-##CS0.cmap.set_under('yellow')
-CS0.cmap.set_over('white')
-CB0 = fig.colorbar(CS0)
-CB0.add_lines(CL0)
-CB0.set_ticks(np.arange(0,levels0[-1]+levels0[1],ldel0*10))
-plt.show()
-
-
-#polito
-exit()
-'''
 ###################################################################
 ### load NM vectors 
 ### Note: pos, atmass and nm are in atomic units.
 
-pos0 = np.loadtxt(path+'pos_ts.dat')
+pos0 = np.loadtxt(path_nm+'pos_ts.dat')
 
-atmass = np.loadtxt(path+'atmass_ts.dat')
+atmass = np.loadtxt(path_nm+'atmass_ts.dat')
 
-nm = np.loadtxt(path+'nm_ts.dat')
+nm = np.loadtxt(path_nm+'nm_ts.dat')
 
 ndgree = len(pos0)
 natoms = int(ndgree/3)
@@ -282,8 +263,8 @@ index_ts2, = np.where(q2==0.0)
 index_ts = [index_ts1,index_ts2]
 print('TS index = ',index_ts)
 
-e_min = np.min(energy_gs)
-index_eq = np.where(energy_gs==e_min)
+e_min = np.min(energy)
+index_eq = np.where(energy==e_min)
 print('EQ index = ',index_eq)
 
 nm_ampl_max = np.zeros(nfreq)
@@ -541,8 +522,8 @@ index_ts2, = np.where(q2==0.0)
 index_ts = [index_ts1,index_ts2]
 print('TS index = ',index_ts)
 
-e_min = np.min(energy_gs)
-index_eq = np.where(energy_gs==e_min)
+e_min = np.min(energy)
+index_eq = np.where(energy==e_min)
 print('EQ index = ',index_eq)
 
 hess_ampl_max = np.zeros([nfreq,nfreq])
@@ -642,15 +623,15 @@ def plot_2d_2x1(data0,data1,title0='',title1='',xlabel0='',xlabel1='',ylabel0=''
 
 	### mark minimun of GROUND STATE
 
-	e_value = np.min(energy_gs[1:int(index1),:])  # left minimum
-	index = np.where(energy_gs==e_value)
+	e_value = np.min(energy[1:int(index1),:])  # left minimum
+	index = np.where(energy==e_value)
 	x1 = q1[index[0]]
 	y1 = q2[index[1]]
 	print('x_min,y_min,e_value = ',x1,y1,e_value)
 	ax[1].plot(x1, y1, color="white", marker = "o",markersize=mksz)
 
-	e_value = np.min(energy_gs[int(index1)+3:ndim1,:])  # right minimum
-	index = np.where(energy_gs==e_value)
+	e_value = np.min(energy[int(index1)+3:ndim1,:])  # right minimum
+	index = np.where(energy==e_value)
 	x1 = q1[index[0]]
 	y1 = q2[index[1]]
 	print('x_min,y_min,e_value = ',x1,y1,e_value)
@@ -875,7 +856,7 @@ ylabel = r'$\mathregular{Q_{5}}$ / a.u. '
 
 #---------------------------------------
 ### PES
-data = energy_gs * Ha2cm
+data = energy * Ha2cm
 title = 'Ground state'
 ctitle = r'$\mathregular{V \ / \ cm^{-1}}$'
 
@@ -1019,7 +1000,7 @@ out.write('# x (au) y (au) V_gs (au) ')
 out.write('npoints = {} {} q1_range = {} {} q2_range = {} {} \n'.format(ndim1,ndim2,q1[0],q1[-1],q2[0],q2[-1]))
 for i in range(ndim1):
 	for j in range(ndim2):
-		out.write('{} {} {} \n'.format(q1[i],q2[j],energy_gs[i,j]))
+		out.write('{} {} {} \n'.format(q1[i],q2[j],energy[i,j]))
 out.close()
 
 ### NM amplitudes
