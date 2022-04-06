@@ -4,8 +4,6 @@ import sys
 import numpy as np
 from math import ceil,floor
 from matplotlib import pyplot as plt
-from matplotlib import cm
-from scipy import interpolate
 
 ###################################################################
 ###        Generates Reactive Potential Energy Surface			###
