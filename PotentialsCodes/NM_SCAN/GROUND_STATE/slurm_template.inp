@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH -J startFile
+#SBATCH --partition=pi_esi
+#SBATCH --time 120:00:00
+#SBATCH --ntasks=12 --nodes=1
+#SBATCH --mem-per-cpu=5000
+#SBATCH -o startFile.err
+
+##################################################################
+### Load the Gaussian module
+module load Gaussian/16-C.01_AVX
+
+##################################################################
+### Set up Gaussian scracth directory
+
+GAUSS_SCRDIR='/home/fas/batista/pev4/scratch60/gauss-scratch/'
+export GAUSS_SCRDIR
+
+##################################################################
+### Run calculation
+
+echo 'Starting program on'
+date
+echo ''
+

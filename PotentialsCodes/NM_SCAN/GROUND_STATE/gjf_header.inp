@@ -1,0 +1,8 @@
+%mem=58GB
+%nprocshared=10
+#p opt=addgic freq wb97xd/cc-pvdz nosymm int=ultrafine scrf=(solvent=CarbonTetraChloride)
+
+NM 2D-scan of HBT TD-WB97XD pVDZ in CTC
+Relaxed.
+
+0 1
