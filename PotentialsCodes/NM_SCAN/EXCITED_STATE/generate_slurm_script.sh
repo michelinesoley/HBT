@@ -4,8 +4,8 @@
 
 rm run_script_*.sh
 
-ndim1=15
-ndim2=15
+ndim1=12
+ndim2=20
 
 for i in `seq 1 $ndim1`;
 do
